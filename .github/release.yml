@@ -7,15 +7,15 @@ changelog:
     authors:
       - octocat
   categories:
-    - title: ':bug: Type: Bug'
+    - title: ":bug: Type: Bug"
       labels:
-        - 'bug'
-    - title: ':memo: Documentation'
+        - "bug"
+    - title: ":memo: Documentation"
       labels:
-        - 'documentation'
-    - title: ':rocket: Type: Feature'
+        - "documentation"
+    - title: ":rocket: Type: Feature"
       labels:
-        - 'enhancement'
+        - "enhancement"
     - title: Other Changes
       labels:
-        - '*'
+        - "*"
