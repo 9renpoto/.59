@@ -24,8 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # - run: npm version ${{ inputs.semver }} --no-git-tag-version --workspaces --no-workspaces-update
-
       - name: generate new version and save to env variable
         uses: actions/github-script@v7
         id: github_releases
@@ -74,7 +72,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           base: main
-          branch: main-${{ steps.get_version.outputs.NEW_VERSION }}
+          branch: release
           commit-message: "bump: v${{ steps.get_version.outputs.NEW_VERSION }}"
           body: ${{ steps.get_release_note.outputs.result  }}
           title: "chore: bump v${{ steps.get_version.outputs.NEW_VERSION }}"
