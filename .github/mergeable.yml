@@ -4,5 +4,5 @@ mergeable:
     validate:
       - do: label
         must_include:
-          regex: bug|documentation|enhancement|dependencies
+          regex: bug|documentation|enhancement|dependencies|Type
           message: must include types
