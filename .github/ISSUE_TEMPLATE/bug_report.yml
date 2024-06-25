@@ -10,6 +10,9 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+
+        - [ ] sample checklist
+        - [ ] sample checklist 2
   - type: input
     id: contact
     attributes:
