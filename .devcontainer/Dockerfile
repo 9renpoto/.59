@@ -1,5 +1,5 @@
 # See https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/docker-in-docker
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
 # hadolint-disable=DL3008
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
