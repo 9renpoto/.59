@@ -20,6 +20,6 @@
 			]
 		}
 	},
-	"postCreateCommand": "pre-commit install",
+	"postCreateCommand": "lefthook install",
 	"remoteUser": "vscode"
 }
