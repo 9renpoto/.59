@@ -20,6 +20,6 @@
 			]
 		}
 	},
-	"postCreateCommand": "lefthook install",
+	"postCreateCommand": "chezmoi init --apply https://github.com/9renpoto/dotfiles && lefthook install",
 	"remoteUser": "vscode"
 }
