@@ -13,12 +13,10 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"esbenp.prettier-vscode",
-				"dbaeumer.vscode-eslint",
 				"ms-azuretools.vscode-docker"
 			]
 		}
 	},
-	"postCreateCommand": "chezmoi init --apply https://github.com/9renpoto/dotfiles",
+	"postCreateCommand": "chezmoi init --apply https://github.com/9renpoto/dotfiles && lefthook install",
 	"remoteUser": "vscode"
 }
