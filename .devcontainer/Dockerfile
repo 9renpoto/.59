@@ -1,16 +1,22 @@
 # See https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/docker-in-docker
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
-# hadolint-disable=DL3008
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-# Install Node.js, cspell, and secretlint
+
+# Install system-wide dependencies
 USER root
+# hadolint ignore=DL3008
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends nodejs=18.17.1-1nodesource1 npm=9.6.7-1nodesource1 git curl \
-    && npm install -g @evilmartians/lefthook cspell@^6.14.3 @secretlint/secretlint-rule-preset-recommend@^5.0.1 secretlint@^5.0.3 \
+    && apt-get -y install --no-install-recommends git curl unzip \
     && sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- -b /usr/local/bin \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Switch back to the non-root user
+# Switch to the non-root user to install user-specific tools
 USER vscode
+
+# Install bun
+RUN curl -fsSL https://bun.sh/install | bash
+
+# Add bun to the PATH
+ENV PATH="/home/vscode/.bun/bin:${PATH}"
