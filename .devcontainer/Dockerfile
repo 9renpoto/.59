@@ -8,7 +8,6 @@ USER root
 # hadolint ignore=DL3008
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends git curl \
-    && sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- -b /usr/local/bin \
     && ARCH=$(dpkg --print-architecture) \
     && case ${ARCH} in \
         "amd64") HADOLINT_ARCH="x86_64" ;; \
