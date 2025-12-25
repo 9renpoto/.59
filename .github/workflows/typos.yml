@@ -7,5 +7,5 @@ jobs:
     name: runner / typos
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: crate-ci/typos@v1.40.0
