@@ -6,7 +6,7 @@ on:
 
 jobs:
   stale:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-slim
 
     steps:
       - uses: actions/stale@v10
