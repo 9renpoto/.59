@@ -18,6 +18,11 @@ on:
         description: The image_name to build for.
         required: true
         type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   bump:
     runs-on: ubuntu-latest
