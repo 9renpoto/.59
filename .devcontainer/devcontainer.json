@@ -4,18 +4,12 @@
 		"dockerfile": "Dockerfile"
 	},
 	"features": {
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {
-			"moby": true,
-			"installDockerBuildx": true,
+		"ghcr.io/devcontainers-extra/features/lefthook-asdf:1": {
 			"version": "latest"
-		}
+		},
+		"ghcr.io/michidk/devcontainers-features/typos:1": {}
 	},
 	"customizations": {
-		"vscode": {
-			"extensions": [
-				"ms-azuretools.vscode-docker"
-			]
-		}
 	},
 	"postCreateCommand": "lefthook install",
 	"remoteUser": "vscode"
