@@ -1,4 +1,4 @@
-# See https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/docker-in-docker
+# Base image for this project's devcontainer
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -16,8 +16,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     esac \
     && curl -sL "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-${HADOLINT_ARCH}" -o /usr/local/bin/hadolint \
     && chmod +x /usr/local/bin/hadolint \
-    && curl -1sLf 'https://dl.cloudsmith.io/public/evilmartians/lefthook/setup.deb.sh' | bash \
-    && apt-get install -y --no-install-recommends lefthook \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
