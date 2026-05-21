@@ -6,14 +6,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  issues: read
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   export_labels:
     runs-on: ubuntu-slim
     timeout-minutes: 5
+    permissions:
+      issues: read
+      contents: write
     steps:
       - uses: EndBug/export-label-config@dd7608994f61774a59e9011a8386ee98976328c9 # v1.0.1
         with:
@@ -22,6 +23,9 @@ jobs:
   create_pull_request:
     runs-on: ubuntu-slim
     timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
     needs:
       - export_labels
     steps:

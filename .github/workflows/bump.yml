@@ -45,13 +45,17 @@ jobs:
 
       - name: semver
         id: get_version
-        run: echo "NEW_VERSION=$(docker run --rm alpine/semver semver -c -i ${{ inputs.semver }} ${{ steps.github_releases.outputs.result }})" >> "$GITHUB_OUTPUT"
+        env:
+          SEMVER: ${{ inputs.semver }}
+          RESULT: ${{ steps.github_releases.outputs.result }}
+        run: echo "NEW_VERSION=$(docker run --rm alpine/semver semver -c -i "$SEMVER" "$RESULT")" >> "$GITHUB_OUTPUT"
 
       - name: Generate release notes
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         id: get_release_note
         env:
           NEW_VERSION: ${{steps.get_version.outputs.NEW_VERSION}}
+          PREVIOUS_VERSION: ${{ steps.github_releases.outputs.result }}
         with:
           result-encoding: string
           script: |
@@ -60,16 +64,16 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 tag_name: `v${process.env.NEW_VERSION}`,
-                previous_tag_name: '${{ steps.github_releases.outputs.result }}',
+                previous_tag_name: process.env.PREVIOUS_VERSION,
               }
             );
             return notes.data.body;
 
       - run: |
-          cat << EOF >> new
-          ## v${{ steps.get_version.outputs.NEW_VERSION }} ($(date '+%Y-%m-%d'))
-          ${{ steps.get_release_note.outputs.result }}
-          EOF
+          printf "## v%s (%s)\n%s\n" "$NEW_VERSION" "$(date '+%Y-%m-%d')" "$RESULT" >> new
+        env:
+          NEW_VERSION: ${{ steps.get_version.outputs.NEW_VERSION }}
+          RESULT: ${{ steps.get_release_note.outputs.result }}
       - run: cat new ./CHANGELOG.md > temp
       - run: mv temp ./CHANGELOG.md
       - run: rm new
