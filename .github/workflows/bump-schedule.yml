@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: ./.github/workflows/bump.yml # zizmor: ignore[secrets-inherit]
-    secrets: inherit
+    uses: ./.github/workflows/bump.yml
+    secrets: {}
     with:
       semver: minor
