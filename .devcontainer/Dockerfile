@@ -16,6 +16,12 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     esac \
     && curl -sL "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-${HADOLINT_ARCH}" -o /usr/local/bin/hadolint \
     && chmod +x /usr/local/bin/hadolint \
+    && case ${ARCH} in \
+        "amd64") ZIZMOR_ARCH="x86_64-unknown-linux-gnu" ;; \
+        "arm64") ZIZMOR_ARCH="aarch64-unknown-linux-gnu" ;; \
+        *) echo "Unsupported architecture: ${ARCH}" && exit 1 ;; \
+    esac \
+    && curl -sL "https://github.com/zizmorcore/zizmor/releases/latest/download/zizmor-${ZIZMOR_ARCH}.tar.gz" | tar -xz -C /usr/local/bin/ \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
