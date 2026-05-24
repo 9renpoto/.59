@@ -4,3 +4,5 @@ pre-commit:
       run: hadolint .devcontainer/Dockerfile
     typos:
       run: typos
+    zizmor:
+      run: zizmor .
