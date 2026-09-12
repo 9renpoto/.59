@@ -1,13 +1,15 @@
-name: gitleaks
+name: CI
 
 on:
   push:
   pull_request:
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
-  gitleaks:
+  lint:
+    name: Lint & Security Checks
     runs-on: ubuntu-slim
     permissions:
       contents: read
@@ -17,6 +19,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Check spelling with typos
+        uses: crate-ci/typos@a8168dc2984a9e2352f183ffe788f0f23a300389 # v1.49.1
 
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
