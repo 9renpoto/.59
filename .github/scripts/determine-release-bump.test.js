@@ -2,8 +2,8 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { determineReleaseBump } = require("./determine-release-bump");
 
-const publishedAt = "2026-10-20T00:00:00Z";
-const pullRequest = (labels, overrides = {}) => ({
+const pullRequest = (sha, labels, overrides = {}) => ({
+  merge_commit_sha: sha,
   merged_at: "2026-10-21T00:00:00Z",
   user: { login: "contributor" },
   labels: labels.map((name) => ({ name })),
@@ -13,8 +13,11 @@ const pullRequest = (labels, overrides = {}) => ({
 test("breaking changes select major even when smaller changes are present", () => {
   assert.equal(
     determineReleaseBump(
-      [pullRequest(["Type: Feature"]), pullRequest(["Type: Breaking Change"])],
-      publishedAt,
+      [
+        pullRequest("feature", ["Type: Feature"]),
+        pullRequest("breaking", ["Type: Breaking Change"]),
+      ],
+      new Set(["feature", "breaking"]),
     ),
     "major",
   );
@@ -23,8 +26,11 @@ test("breaking changes select major even when smaller changes are present", () =
 test("features select minor when there are no breaking changes", () => {
   assert.equal(
     determineReleaseBump(
-      [pullRequest(["documentation"]), pullRequest(["enhancement"])],
-      publishedAt,
+      [
+        pullRequest("documentation", ["documentation"]),
+        pullRequest("feature", ["enhancement"]),
+      ],
+      new Set(["documentation", "feature"]),
     ),
     "minor",
   );
@@ -33,23 +39,38 @@ test("features select minor when there are no breaking changes", () => {
 test("other and uncategorized included changes select patch", () => {
   assert.equal(
     determineReleaseBump(
-      [pullRequest(["Type: Bug"]), pullRequest([])],
-      publishedAt,
+      [pullRequest("bug", ["Type: Bug"]), pullRequest("other", [])],
+      new Set(["bug", "other"]),
     ),
     "patch",
   );
 });
 
-test("release-excluded changes and changes merged before the latest release do not trigger a bump", () => {
+test("release-excluded changes and commits outside the tag range do not trigger a bump", () => {
   assert.equal(
     determineReleaseBump(
       [
-        pullRequest(["Type: Breaking Change", "ignore-for-release"]),
-        pullRequest(["Type: Feature"], { user: { login: "octocat" } }),
-        pullRequest(["Type: Bug"], { merged_at: "2026-10-19T23:59:59Z" }),
+        pullRequest("excluded-label", [
+          "Type: Breaking Change",
+          "ignore-for-release",
+        ]),
+        pullRequest("excluded-author", ["Type: Feature"], {
+          user: { login: "octocat" },
+        }),
+        pullRequest("before-tag", ["Type: Bug"]),
       ],
-      publishedAt,
+      new Set(["excluded-label", "excluded-author"]),
     ),
     null,
+  );
+});
+
+test("commits merged after the release tag count even if publication happens later", () => {
+  assert.equal(
+    determineReleaseBump(
+      [pullRequest("merged-between-tag-and-publication", ["Type: Bug"])],
+      new Set(["merged-between-tag-and-publication"]),
+    ),
+    "patch",
   );
 });

@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   determine_bump:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
       pull-requests: read
@@ -28,16 +28,39 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
+            const releaseCommitShas = new Set();
+            for (let page = 1; ; page += 1) {
+              const comparison = await github.rest.repos.compareCommits({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                base: release.data.tag_name,
+                head: "main",
+                per_page: 100,
+                page,
+              });
+              if (!["ahead", "identical"].includes(comparison.data.status)) {
+                throw new Error(
+                  `Latest release tag ${release.data.tag_name} is not an ancestor of main`
+                );
+              }
+              for (const commit of comparison.data.commits) {
+                releaseCommitShas.add(commit.sha);
+              }
+              if (comparison.data.commits.length < 100) {
+                break;
+              }
+            }
             const pullRequests = await github.paginate(github.rest.pulls.list, {
               owner: context.repo.owner,
               repo: context.repo.repo,
+              base: "main",
               state: "closed",
               per_page: 100,
             });
             const { determineReleaseBump } = require(
               `${process.env.GITHUB_WORKSPACE}/.github/scripts/determine-release-bump.js`
             );
-            const semver = determineReleaseBump(pullRequests, release.data.published_at);
+            const semver = determineReleaseBump(pullRequests, releaseCommitShas);
             core.setOutput("semver", semver ?? "");
 
   scheduled_bump:

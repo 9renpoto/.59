@@ -1,16 +1,11 @@
 const EXCLUDED_LABEL = "ignore-for-release";
 const EXCLUDED_AUTHOR = "octocat";
 
-function determineReleaseBump(pullRequests, latestReleasePublishedAt) {
-  if (!latestReleasePublishedAt) {
-    throw new Error("The latest release must have a published_at timestamp");
-  }
-
-  const latestReleaseTime = Date.parse(latestReleasePublishedAt);
+function determineReleaseBump(pullRequests, releaseCommitShas) {
   const includedPullRequests = pullRequests.filter((pullRequest) => {
     if (
       !pullRequest.merged_at ||
-      Date.parse(pullRequest.merged_at) <= latestReleaseTime
+      !releaseCommitShas.has(pullRequest.merge_commit_sha)
     ) {
       return false;
     }
