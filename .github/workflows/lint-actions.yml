@@ -23,7 +23,6 @@ jobs:
         with:
           reporter: github-pr-review
           fail_level: error
-          actionlint_flags: -ignore 'reusable workflow call "\$/.+" at "uses" is not following the format'
 
   zizmor:
     runs-on: ubuntu-latest
