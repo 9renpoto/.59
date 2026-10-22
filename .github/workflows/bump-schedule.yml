@@ -8,10 +8,67 @@ permissions:
   contents: read
 
 jobs:
+  determine_bump:
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      semver: ${{ steps.release_bump.outputs.semver }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        id: release_bump
+        with:
+          script: |
+            const release = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const releaseCommitShas = new Set();
+            for (let page = 1; ; page += 1) {
+              const comparison = await github.rest.repos.compareCommits({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                base: release.data.tag_name,
+                head: "main",
+                per_page: 100,
+                page,
+              });
+              if (!["ahead", "identical"].includes(comparison.data.status)) {
+                throw new Error(
+                  `Latest release tag ${release.data.tag_name} is not an ancestor of main`
+                );
+              }
+              for (const commit of comparison.data.commits) {
+                releaseCommitShas.add(commit.sha);
+              }
+              if (comparison.data.commits.length < 100) {
+                break;
+              }
+            }
+            const pullRequests = await github.paginate(github.rest.pulls.list, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: "main",
+              state: "closed",
+              per_page: 100,
+            });
+            const { determineReleaseBump } = require(
+              `${process.env.GITHUB_WORKSPACE}/.github/scripts/determine-release-bump.js`
+            );
+            const semver = determineReleaseBump(pullRequests, releaseCommitShas);
+            core.setOutput("semver", semver ?? "");
+
   scheduled_bump:
+    needs: determine_bump
+    if: needs.determine_bump.outputs.semver != ''
     permissions:
       contents: write
       pull-requests: write
-    uses: $/.github/workflows/bump.yml 
+    uses: $/.github/workflows/bump.yml
     with:
-      semver: minor
+      semver: ${{ needs.determine_bump.outputs.semver }}
