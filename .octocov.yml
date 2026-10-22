@@ -1,0 +1,3 @@
+coverage:
+  badge:
+    path: public/coverage.svg
